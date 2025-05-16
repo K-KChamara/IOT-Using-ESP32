@@ -1,20 +1,29 @@
+#include <WiFi.h>
 #include <WifiManager.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
+WiFiUDP udp;
+NTPClient timeClient(udp);
 
 void setup(){
   Serial.begin(115200);
 
-  WiFiManager wifiManager;
-  bool res = wifiManager.autoConnect("Kasun's ESP32", "12345678");
+  WiFi.begin("Wokwi-GUEST", "");
 
-  if(!res){
-    Serial.println("Failed to connect");
-    ESP.restart();
-  
-  }else{
-    Serial.println("Done..!");
+  while(WiFi.status() != WL_CONNECTED){
+    Serial.print(".");
+    delay(500);
   }
+  Serial.println("Connected..!");
+   Serial.print("Gateway IP : ");
+  Serial.println(WiFi.localIP());
 
+  timeClient.begin();
 }
-void loop(){
 
+void loop(){
+  timeClient.update();
+  Serial.println(timeClient.getFormattedTime());
+  delay(1000);
 }
